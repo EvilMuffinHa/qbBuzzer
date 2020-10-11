@@ -1,0 +1,82 @@
+html {
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+}
+
+body {
+	background-color: #e5e2c9;
+}
+
+
+.wrap {
+	align-items: center;
+}
+
+.title {
+	text-align: center;
+	font-family: 'Abberancy-Regular';
+	font-size: 3.3rem;
+}
+
+.button {
+	align-items: center;
+	justify-content: center;
+}
+
+.button a {
+  -webkit-appearance: none;
+  background: -webkit-gradient(to right,#a2ccb6 0%,#fceeb5 50%,#ee786e 100%);
+  background: linear-gradient(to right,#a2ccb6 0%,#fceeb5 50%,#ee786e 100%);
+  border-top: 18px;
+  padding-right: 18px;
+  padding-left: 18px;
+  padding-bottom: 9px;
+  padding-top: 9px;
+  border-radius: 5rem;
+  border-style: none;
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+  width: 20rem;
+  letter-spacing: 0.20rem;
+  background-size: 300%;
+  text-decoration: none;
+  color: white;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font: 1em Raleway, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-position: 0% 50%;
+  transition: background-position 1s;
+}
+
+
+.button a:hover {
+  background-position: 100%
+}
+
+.button a:focus {
+  color: white;
+}
+
+@font-face {
+  font-family: 'Abberancy-Regular';
+  src: url('Abberancy-Regular.svg#Abberancy-Regular') format('svg'),
+       url('Abberancy-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'abberancy';
+  src: url('abberancy.eot');
+  src: url('abberancy.eot?#iefix') format('embedded-opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
