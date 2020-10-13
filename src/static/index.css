@@ -20,7 +20,13 @@ body {
 	font-size: 3.3rem;
 }
 
-.button {
+.subttl {
+	text-align: center;
+	font-family: 'Abberancy-Regular';
+	font-size: 2rem;
+}
+
+.center {
 	align-items: center;
 	justify-content: center;
 }
@@ -62,6 +68,30 @@ body {
 .button a:focus {
   color: white;
 }
+
+.back {
+    background: -webkit-gradient(to right,#a2ccb6 0%,#fceeb5 50%,#ee786e 100%);
+    background: linear-gradient(to right,#a2ccb6 0%,#fceeb5 50%,#ee786e 100%);
+	border-top: 12px;
+    padding-right: 12px;
+    padding-left: 12px;
+    padding-bottom: 6px;
+    padding-top: 6px;
+    border-radius: 3.75rem;
+    border-style: none;
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+    width: 15rem;
+    letter-spacing: 0.13rem;
+    background-size: 300%;
+    text-decoration: none;
+    color: white;
+	font: 0.5em Raleway, sans-serif;
+}
+.top {
+	margin-top: 17px;
+	margin-left: 5px;
+}
+
 
 @font-face {
   font-family: 'Abberancy-Regular';

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+		<div class="title">
+			<h1> Buzzer! </h1>
+		</div>
+		<div class="button">
+			<center>
+				<a href="{{ url_for('host') }}">Host Game</a>
+				<br><br><br>
+				<a href="{{ url_for('join') }}">Join Game</a>
+			</center>
+		</div>
+{% endblock %}

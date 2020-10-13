@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="button top">
+	<a href="{{ url_for('home') }}">Back</a>
+</div>
+<div class="subttl">
+	<h1> Host Game </h1>
+</div>
+<form action="" method="post" novalidate>
+	{{ form.csrf_token }}
+	{{ form.hidden_tag() }}
+	<p>
+		{{ form.tossup.label }}<br>
+		{{ form.tossup(size=32, value=default[0]) }}<br>
+		{% for error in form.tossup.errors %}
+		<span style="color: red;">[{{ error }}]</span><br>
+		{% endfor %}
+		<br>
+		{{ form.bonus.label }}<br>
+		{{ form.bonus(size=32, value=default[1]) }}<br>
+		{% for error in form.bonus.errors %}
+		<span style="color: red;">[{{ error }}]</span><br>
+		{% endfor %}
+		<br>
+		{{ form.power.label }}<br>
+		{{ form.power(size=32, value=default[2]) }}<br>
+		{% for error in form.power.errors %}
+		<span style="color: red;">[{{ error }}]</span><br>
+		{% endfor %}
+		<br>
+		{{ form.negs.label }}<br>
+		{{ form.negs(size=32, value=default[3]) }}<br>
+		{% for error in form.negs.errors %}
+		<span style="color: red;">[{{ error }}]</span><br>
+		{% endfor %}
+		<br>
+		{{ form.teams() }} {{ form.teams.label }}<br>
+		{% for error in form.negs.errors %}
+		<span style="color: red;">[{{ error }}]</span><br>
+		{% endfor %}
+		<br>
+		{{ form.create() }}
+		<br>
+	</p>
+</form>
+{% endblock %}
