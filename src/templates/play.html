@@ -1,9 +1,42 @@
-{% extends "base.html" %}
-
-{% block content %}
-		<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
-		<script src="/static/game.js" type="text/javascript" charset="utf-8"></script>
-		<div id="game">
-
+<!DOCTYPE html>
+<html lang="en">
+	{% if title %}
+	<head>
+		<meta charset="UTF-8">
+		<link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico" />
+		<link rel="stylesheet" href="/static/index.css?version={{ version }}">
+		<title>{{ title }} - Buzzer! </title>
+	</head>
+	{% else %}
+	<head>
+		<title> Buzzer! </title>
+		<link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico" />
+		<link rel="stylesheet" href="/static/index.css?version={{ version }}">
+	</head>
+	{% endif %}
+	<body class="wrap">
+		<div class="subttl">
+			<h1> Play! </h1>
 		</div>
-{% endblock %}
+
+		<br><input type="hidden" id="code" name="code" value="{{ gamecode }}"><br>
+		<br><input type="hidden" id="name" name="name" value="{{ username }}">
+		<br><input type="hidden" id="kick" name="kick" value="{{ url_for('kick') }}">
+		<div class="sidebar" id="sidebar">
+		</div>
+		<div id="game">
+			<center>
+				<div class="form name">
+
+				</div>
+				<div class="button buzzer">
+					<a onclick="buzz();">BUZZ! [SPACE]</a>
+				</div>
+			</center>
+		</div>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+		<script src="/static/game.js?version={{ version }}" type="text/javascript" charset="utf-8"></script>
+	</body>
+</html>

@@ -20,6 +20,10 @@ def sha3256(val):
 	return ho.digest()
 
 
+def whitelist():
+	return list(ascii_letters + digits)
+
+
 def hexdigest(val):
 	return hexlify(val).decode('utf-8')
 

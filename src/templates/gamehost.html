@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+		<div class="subttl">
+			<h1> Game! </h1>
+		</div>
+
+		<div class="sidebar" id="sidebar">
+
+		</div>
+		<div id="join">
+			<center>
+				<p>Click to copy the game code: </p>
+				<input id="copycode" class="copycode" name="copycode" value="{{ gamecode }}" type="text" size="32" readonly onclick="copycode();"/>
+			</center>
+		</div>
+		<div id="game">
+		</div>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+		<script src="/static/host.js?version={{ version }}" type="text/javascript" charset="utf-8"></script>
+{% endblock %}

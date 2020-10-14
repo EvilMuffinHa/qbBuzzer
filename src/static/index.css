@@ -92,6 +92,63 @@ body {
 	margin-left: 5px;
 }
 
+.copycode {
+	text-align: center;
+}
+
+.form {
+	text-align: center;
+}
+
+.form input {
+	text-align: center;
+}
+
+.sidebar {
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  font-size: 25px;
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  left: 0;
+  background-color: #e2e27c;
+  padding-top: 20px;
+  padding-left: 10px;
+  padding-right: 20px;
+}
+
+/* The navigation menu links */
+.sidebar a {
+  padding: 6px 8px 6px 8px;
+  text-decoration: none;
+  font-size: 14px;
+  color: #ea2a2d;
+  display: inline;
+}
+
+.sidebar p {
+  padding: 6px 8px 6px 6px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: inline;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidebar a:hover {
+  color: #f1f1f1;
+}
+
+/* Style page content */
+.game {
+  padding: 0px 10px;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .sidebar {padding-top: 15px;}
+  .sidebar a {font-size: 18px;}
+}
 
 @font-face {
   font-family: 'Abberancy-Regular';
