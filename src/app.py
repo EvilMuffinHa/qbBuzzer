@@ -44,7 +44,7 @@ def host():
 		hash = dohash(hostcode)
 		resp = redirect(url_for("play", hash=hash))
 		resp.set_cookie("_gid", str(hostcode))
-		with open("src/templates/games.json", "r") as f:
+		with open("templates/games.json", "r") as f:
 			tmp = json.load(f)
 		games[hash] = tmp
 		games[hash]["hostcode"] = hostcode
@@ -57,7 +57,7 @@ def host():
 		session.permanent = True
 		return resp
 
-	with open("src/templates/games.json", "r") as f:
+	with open("templates/games.json", "r") as f:
 		tmp = json.load(f)
 	default = [tmp["tossup"], tmp["bonus"], tmp["power"], tmp["negs"]]
 	return render_template('host.html', title="Host Game", version=str(version), form=form, default=default)
