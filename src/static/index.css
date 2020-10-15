@@ -6,7 +6,11 @@ html {
 }
 
 body {
-	background-color: #ffffff;
+  background: #EFEFEF;
+  background: linear-gradient(#EFEFEF, #696969), linear-gradient(to right, #888888, #C2C2C2, #888888);
+  background-blend-mode: screen;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 
