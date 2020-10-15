@@ -116,6 +116,11 @@ socket.on("buzz_event", function(data) {
 	audio.play();
 	var player = data["username"];
 	document.getElementById(player).childNodes[0].style.color = "#2c26e2";
+	var buzztext = document.createElement("p");
+	buzztext.setAttribute("id", player + "_buzz");
+	buzztext.innerHTML = "[BUZZ] "
+	buzztext.style.color = "#2c26e2";
+	document.getElementById(player).insertBefore(buzztext, document.getElementById(player).childNodes[0]);
 	document.getElementById(player).childNodes[1].style.color = "#2c26e2";
 	game = document.getElementById("game");
 	var tossup = document.createElement("a");
@@ -156,6 +161,8 @@ socket.on("update_score_event", function(datas) {
 	var player = datas["username"];
 	document.getElementById(player).childNodes[0].style.color = "";
 	document.getElementById(player).childNodes[1].style.color = "";
+	var buzztext = document.getElementById(player + "_buzz")
+	buzztext.parentNode.removeChild(buzztext);
 	data = datas["players"]
 	div = document.getElementById("sidebar");
 	removeAllChildren(div);

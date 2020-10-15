@@ -92,7 +92,7 @@ def join():
 	form = JoinForm()
 	if form.validate_on_submit():
 		wlist = whitelist()
-		if not all([a in wlist for a in form.name.data]):
+		if (not all([a in wlist for a in form.name.data])) or (len(form.name.data) > 12):
 			return render_template('badname.html', title='Join Game', version=str(version))
 		hash = form.roomcode.data
 		if hash in games.keys():
