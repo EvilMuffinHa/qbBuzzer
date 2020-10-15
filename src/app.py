@@ -1,16 +1,18 @@
 from flask import *
 from random import randint as rint
-from src.config import Config
-from src.host import HostForm
-from src.join import JoinForm
-from src.sec import gencode, dohash, whitelist
+from config import Config
+from host import HostForm
+from join import JoinForm
+from sec import gencode, dohash, whitelist
 from logging.config import dictConfig
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import json
+from dotenv import load_dotenv
 
+load_dotenv()
 
 # Loading logging preferences
-with open("src/logger.json", "r") as f:
+with open("logger.json", "r") as f:
 	dconf = json.load(f)
 
 # Establishing logger
@@ -44,7 +46,7 @@ def host():
 		hash = dohash(hostcode)
 		resp = redirect(url_for("play", hash=hash))
 		resp.set_cookie("_gid", str(hostcode))
-		with open("src/templates/games.json", "r") as f:
+		with open("templates/games.json", "r") as f:
 			tmp = json.load(f)
 		games[hash] = tmp
 		games[hash]["hostcode"] = hostcode
@@ -57,7 +59,7 @@ def host():
 		session.permanent = True
 		return resp
 
-	with open("src/templates/games.json", "r") as f:
+	with open("templates/games.json", "r") as f:
 		tmp = json.load(f)
 	default = [tmp["tossup"], tmp["bonus"], tmp["power"], tmp["negs"]]
 	return render_template('host.html', title="Host Game", version=str(version), form=form, default=default)
@@ -136,7 +138,10 @@ def on_join(data):
 		if dohash(gid) == room:
 			username = "host"
 	join_room(str(room))
-	msg = {"locked": games[room]["locked"], "players": games[room]["players"]}
+	try:
+		msg = {"locked": games[room]["locked"], "players": games[room]["players"]}
+	except KeyError:
+		return render_template('gamenotfound.html', title="Join Game", version=str(version))
 	emit('player_join_event', msg, room=room)
 
 
