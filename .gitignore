@@ -133,5 +133,4 @@ dmypy.json
 # jetbrains folder
 .idea/
 qbBuzzer.iml
-test/
 

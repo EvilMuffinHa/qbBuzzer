@@ -6,7 +6,7 @@ WORKDIR /root/
 
 RUN pip install -r requirements.txt
 
-WORKDIR /root/src
+WORKDIR /root/
 
-CMD [ "python", "app.py" ]
-# CMD [ "gunicorn", "-b", "0.0.0.0:25565","--workers", "3", "--timeout", "86400", "src.app:app" ]
+# CMD [ "python", "app.py" ]
+CMD [ "gunicorn", "-b", "0.0.0.0:25565","--workers", "3", "--timeout", "86400", "-k", "eventlet", "src.app:app" ]

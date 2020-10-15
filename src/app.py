@@ -1,9 +1,9 @@
 from flask import *
 from random import randint as rint
-from config import Config
-from host import HostForm
-from join import JoinForm
-from sec import gencode, dohash, whitelist
+from src.config import Config
+from src.host import HostForm
+from src.join import JoinForm
+from src.sec import gencode, dohash, whitelist
 from logging.config import dictConfig
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import json
@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Loading logging preferences
-with open("logger.json", "r") as f:
+with open("src/logger.json", "r") as f:
 	dconf = json.load(f)
 
 # Establishing logger
@@ -46,7 +46,7 @@ def host():
 		hash = dohash(hostcode)
 		resp = redirect(url_for("play", hash=hash))
 		resp.set_cookie("_gid", str(hostcode))
-		with open("templates/games.json", "r") as f:
+		with open("src/templates/games.json", "r") as f:
 			tmp = json.load(f)
 		games[hash] = tmp
 		games[hash]["hostcode"] = hostcode
@@ -59,7 +59,7 @@ def host():
 		session.permanent = True
 		return resp
 
-	with open("templates/games.json", "r") as f:
+	with open("src/templates/games.json", "r") as f:
 		tmp = json.load(f)
 	default = [tmp["tossup"], tmp["bonus"], tmp["power"], tmp["negs"]]
 	return render_template('host.html', title="Host Game", version=str(version), form=form, default=default)
@@ -130,6 +130,8 @@ socketio = SocketIO(app)
 @socketio.on('join')
 def on_join(data):
 	room = data['room']
+	if room not in games.keys():
+		return render_template('gamenotfound.html', title="Join Game", version=str(version))
 	username = ""
 	if "username" in data.keys():
 		username = data['username']
@@ -138,10 +140,7 @@ def on_join(data):
 		if dohash(gid) == room:
 			username = "host"
 	join_room(str(room))
-	try:
-		msg = {"locked": games[room]["locked"], "players": games[room]["players"]}
-	except KeyError:
-		return render_template('gamenotfound.html', title="Join Game", version=str(version))
+	msg = {"locked": games[room]["locked"], "players": games[room]["players"]}
 	emit('player_join_event', msg, room=room)
 
 
@@ -150,6 +149,8 @@ def on_join(data):
 def host_msg(data):
 	room = data["room"]
 	gid = data["_gid"]
+	if room not in games.keys():
+		return render_template('gamenotfound.html', title="Join Game", version=str(version))
 	if dohash(gid) != room:  # Check if the host is really the host
 		return
 	msg = data["data"]
@@ -203,6 +204,8 @@ def host_msg(data):
 @socketio.on('buzz')
 def buzz(data):
 	room = data["room"]
+	if room not in games.keys():
+		return render_template('gamenotfound.html', title="Join Game", version=str(version))
 	if not games[room]["locked"]:
 		games[room]["buzzed"] = data["username"]
 		emit("buzz_event", data, room=room)  # Just send it back
@@ -213,6 +216,8 @@ def buzz(data):
 @socketio.on('leave')
 def on_leave(data):
 	room = data['room']
+	if room not in games.keys():
+		return render_template('gamenotfound.html', title="Join Game", version=str(version))
 	username = ""
 	if "username" in data.keys():
 		username = data['username']
