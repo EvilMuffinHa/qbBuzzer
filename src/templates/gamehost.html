@@ -12,10 +12,26 @@
 			<center>
 				<p>Click to copy the game code: </p>
 				<input id="copycode" class="copycode" name="copycode" value="{{ gamecode }}" type="text" size="32" readonly onclick="copycode();"/>
+				<input type="hidden" id="close_url" name="close_url" value="{{ url_for('host') }}">
+				<br><br><br>
+				<div class="button">
+					<a onclick="lockBuzzers();" id="lock_bz">Lock Buzzers [L]</a>
+				</div>
+				<br><br><br>
+				<div class="button">
+					<a onclick="closeGame();" id="leave">Close Game</a>
+				</div>
 			</center>
 		</div>
-		<div id="game">
+		<br><br><br>
+		<div class="button game">
+			<center>
+				<div id="game">
+
+				</div>
+			</center>
 		</div>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
 		<script src="/static/host.js?version={{ version }}" type="text/javascript" charset="utf-8"></script>
 {% endblock %}

@@ -4,6 +4,7 @@
   "bonus": 20,
   "power": 15,
   "negs": 5,
-  "teams": false,
+  "locked": false,
+  "buzzed": "",
   "players": {}
 }

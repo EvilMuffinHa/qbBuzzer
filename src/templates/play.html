@@ -22,6 +22,7 @@
 		<br><input type="hidden" id="code" name="code" value="{{ gamecode }}"><br>
 		<br><input type="hidden" id="name" name="name" value="{{ username }}">
 		<br><input type="hidden" id="kick" name="kick" value="{{ url_for('kick') }}">
+		<input type="hidden" id="hostleave" name="hostleave" value="{{ url_for('join') }}">
 		<div class="sidebar" id="sidebar">
 		</div>
 		<div id="game">
@@ -30,7 +31,7 @@
 
 				</div>
 				<div class="button buzzer">
-					<a onclick="buzz();">BUZZ! [SPACE]</a>
+					<a onclick="buzz();" id="b_buzzer">BUZZ! [SPACE]</a>
 				</div>
 			</center>
 		</div>

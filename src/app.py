@@ -8,6 +8,7 @@ from logging.config import dictConfig
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import json
 
+
 # Loading logging preferences
 with open("logger.json", "r") as f:
 	dconf = json.load(f)
@@ -19,6 +20,7 @@ dictConfig(dconf)
 app = Flask(__name__)
 app.logger.info("Flask app loaded at " + __name__)
 app.config.from_object(Config)
+
 
 # Version allows css / js to load instead of taking hours to update even on run smh
 version = rint(0, 300000000)
@@ -52,8 +54,12 @@ def host():
 		games[hash]["negs"] = form.negs.data
 		app.logger.debug("Game host at %s", hostcode)
 		app.logger.info("Game created at %s", hash)
+		session.permanent = True
 		return resp
-	default = [10, 20, 15, 5]
+
+	with open("src/templates/games.json", "r") as f:
+		tmp = json.load(f)
+	default = [tmp["tossup"], tmp["bonus"], tmp["power"], tmp["negs"]]
 	return render_template('host.html', title="Host Game", version=str(version), form=form, default=default)
 
 
@@ -97,6 +103,7 @@ def join():
 			return resp
 		else:
 			return render_template('gamenotfound.html', title="Join Game", version=str(version))
+	session.permanent = True
 	return render_template('join.html', title="Join Game", version=str(version), form=form)
 
 
@@ -114,10 +121,7 @@ socketio = SocketIO(app)
 #    V
 
 
-@socketio.on('json')
-def handle_json(json):
-	print('received message: ' + str(json))
-	emit('json', json)
+
 
 
 # Checks when a player / host joins the room
@@ -132,7 +136,8 @@ def on_join(data):
 		if dohash(gid) == room:
 			username = "host"
 	join_room(str(room))
-	emit('player_join_event', games[room]["players"], room=room)
+	msg = {"locked": games[room]["locked"], "players": games[room]["players"]}
+	emit('player_join_event', msg, room=room)
 
 
 # When the host sends data to server
@@ -144,35 +149,64 @@ def host_msg(data):
 		return
 	msg = data["data"]
 	if "lock" in msg.keys():
-		pass  # lock buzzers
+		games[room]["locked"] = True
+		emit("locked_event", msg, room=room)
+	elif "unlock" in msg.keys():
+		games[room]["locked"] = False
+		emit("unlocked_event", msg, room=room)
 	elif "kick" in msg.keys():
 		msg["url"] = url_for('kick')
 		username = msg["kick"]
 		del games[room]["players"][username]
 		emit("player_kick_event", msg, room=room)
+	elif "close" in msg.keys():
+		emit("host_leave_event", {"host": 0}, room=room)
 	elif "tossup" in msg.keys():
-		pass  # give player points
+		if games[room]["buzzed"] == "":
+			return
+		games[room]["players"][games[room]["buzzed"]] += games[room]["tossup"]
+		username = games[room]["buzzed"]
+		games[room]["buzzed"] = ""
+		emit("update_score_event", {"username":username, "players": games[room]["players"]}, room=room)
+		emit("unlocked_event", {}, room=room)
 	elif "bonus" in msg.keys():
-		pass  # give player points
+		if games[room]["buzzed"] == "":
+			return
+		games[room]["players"][games[room]["buzzed"]] += games[room]["bonus"]
+		username = games[room]["buzzed"]
+		games[room]["buzzed"] = ""
+		emit("update_score_event", {"username":username, "players": games[room]["players"]}, room=room)
+		emit("unlocked_event", {}, room=room)
 	elif "power" in msg.keys():
-		pass  # give player points
+		if games[room]["buzzed"] == "":
+			return
+		games[room]["players"][games[room]["buzzed"]] += games[room]["power"]
+		username = games[room]["buzzed"]
+		games[room]["buzzed"] = ""
+		emit("update_score_event", {"username":username, "players": games[room]["players"]}, room=room)
+		emit("unlocked_event", {}, room=room)
 	elif "negs" in msg.keys():
-		pass  # give player points
-	elif "amount" in msg.keys():
-		pass  # give player points
-
+		if games[room]["buzzed"] == "":
+			return
+		games[room]["players"][games[room]["buzzed"]] -= games[room]["negs"]
+		username = games[room]["buzzed"]
+		games[room]["buzzed"] = ""
+		emit("update_score_event", {"username":username, "players": games[room]["players"]}, room=room)
+		emit("unlocked_event", {}, room=room)
 
 # When the player buzzes
 @socketio.on('buzz')
 def buzz(data):
 	room = data["room"]
-	emit("buzz", data, room=room)  # Just send it back
+	if not games[room]["locked"]:
+		games[room]["buzzed"] = data["username"]
+		emit("buzz_event", data, room=room)  # Just send it back
+		emit("locked_event", {}, room=room)
 
 
 # When a player / host leaves
 @socketio.on('leave')
 def on_leave(data):
-	print("player leave")
 	room = data['room']
 	username = ""
 	if "username" in data.keys():
@@ -180,9 +214,11 @@ def on_leave(data):
 	else:
 		gid = data["_gid"]
 		if dohash(gid) == room:
-			username = "host"
+			leave_room(str(room))
+			emit('host_leave_event', {'host': 0}, room=room)
+			return
 	del games[room]["players"][username]
-	leave_room(room)
+	leave_room(str(room))
 	emit('player_leave_event', {"player": username}, room=room)
 
 
