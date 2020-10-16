@@ -70,11 +70,18 @@ def host():
 def play(hash):
 	if hash in games.keys():
 		if dohash(request.cookies.get('_gid')) == hash:
-			return render_template('gamehost.html', version=str(version), gamecode=hash)
+			return render_template('gamehost.html', title="Host", version=str(version), gamecode=hash)
 		else:
 			if "name" in request.cookies:
 				name = request.cookies.get("name")
-				return render_template('play.html', version=str(version), gamecode=hash, username=name)
+				wlist = whitelist()
+				if name in games[hash]["players"].keys():
+					return render_template('nametaken.html', title='Join Game', version=str(version))
+				elif (not all([a in wlist for a in name])) or (len(name) > 12):
+					return render_template('badname.html', title='Join Game', version=str(version))
+				else:
+					games[hash]["players"][name] = 0
+					return render_template('play.html', version=str(version), title="Play", gamecode=hash, username=name)
 			else:
 				return render_template('please.html', version=str(version))
 	else:
@@ -98,7 +105,6 @@ def join():
 		if hash in games.keys():
 			if form.name.data in games[hash]["players"].keys():
 				return render_template('nametaken.html', title='Join Game', version=str(version))
-			games[hash]["players"][form.name.data] = 0
 			resp = redirect(url_for("play", hash=hash))
 			resp.set_cookie("_gid", "")
 			resp.set_cookie("name", form.name.data)
