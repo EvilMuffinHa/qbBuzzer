@@ -23,7 +23,6 @@ app = Flask(__name__)
 app.logger.info("Flask app loaded at " + __name__)
 app.config.from_object(Config)
 
-
 # Version allows css / js to load instead of taking hours to update even on run smh
 version = rint(0, 300000000)
 
@@ -80,8 +79,10 @@ def play(hash):
 				elif (not all([a in wlist for a in name])) or (len(name) > 12):
 					return render_template('badname.html', title='Join Game', version=str(version))
 				else:
-					games[hash]["players"][name] = 0
-					return render_template('play.html', version=str(version), title="Play", gamecode=hash, username=name)
+					player_token = gencode(128)
+					games[hash]["players"][name] = [0, player_token]
+					return render_template('play.html', version=str(version), title="Play", gamecode=hash,
+										   username=name, token=player_token)
 			else:
 				return render_template('please.html', version=str(version))
 	else:
@@ -129,24 +130,22 @@ socketio = SocketIO(app)
 #    V
 
 
-
-
-
 # Checks when a player / host joins the room
 @socketio.on('join')
 def on_join(data):
 	room = data['room']
+	if dohash(data["_gid"]) == room:
+		pass
+	elif games[room]["players"][data['username']][1] != data['_gid']:
+		return
 	if room not in games.keys():
 		return render_template('gamenotfound.html', title="Join Game", version=str(version))
-	username = ""
-	if "username" in data.keys():
-		username = data['username']
-	else:
-		gid = data["_gid"]
-		if dohash(gid) == room:
-			username = "host"
 	join_room(str(room))
-	msg = {"locked": games[room]["locked"], "players": games[room]["players"]}
+	nplayers = {}
+	for r in games[room]["players"].keys():
+		nplayers[r] = games[room]["players"][r][0]
+	msg = {"locked": games[room]["locked"], "players": nplayers}
+	print(msg)
 	emit('player_join_event', msg, room=room)
 
 
@@ -176,40 +175,55 @@ def host_msg(data):
 	elif "tossup" in msg.keys():
 		if games[room]["buzzed"] == "":
 			return
-		games[room]["players"][games[room]["buzzed"]] += games[room]["tossup"]
+		games[room]["players"][games[room]["buzzed"]][0] += games[room]["tossup"]
 		username = games[room]["buzzed"]
 		games[room]["buzzed"] = ""
-		emit("update_score_event", {"username":username, "players": games[room]["players"]}, room=room)
+		nplayers = {}
+		for r in games[room]["players"].keys():
+			nplayers[r] = games[room]["players"][r][0]
+		emit("update_score_event", {"username": username, "players": nplayers}, room=room)
 		emit("unlocked_event", {}, room=room)
 	elif "bonus" in msg.keys():
 		if games[room]["buzzed"] == "":
 			return
-		games[room]["players"][games[room]["buzzed"]] += games[room]["bonus"]
+		games[room]["players"][games[room]["buzzed"]][0] += games[room]["bonus"]
 		username = games[room]["buzzed"]
 		games[room]["buzzed"] = ""
-		emit("update_score_event", {"username":username, "players": games[room]["players"]}, room=room)
+		nplayers = {}
+		for r in games[room]["players"].keys():
+			nplayers[r] = games[room]["players"][r][0]
+		emit("update_score_event", {"username": username, "players": nplayers}, room=room)
 		emit("unlocked_event", {}, room=room)
 	elif "power" in msg.keys():
 		if games[room]["buzzed"] == "":
 			return
-		games[room]["players"][games[room]["buzzed"]] += games[room]["power"]
+		games[room]["players"][games[room]["buzzed"]][0] += games[room]["power"]
 		username = games[room]["buzzed"]
 		games[room]["buzzed"] = ""
-		emit("update_score_event", {"username":username, "players": games[room]["players"]}, room=room)
+		nplayers = {}
+		for r in games[room]["players"].keys():
+			nplayers[r] = games[room]["players"][r][0]
+		emit("update_score_event", {"username": username, "players": nplayers}, room=room)
 		emit("unlocked_event", {}, room=room)
 	elif "negs" in msg.keys():
 		if games[room]["buzzed"] == "":
 			return
 		games[room]["players"][games[room]["buzzed"]] -= games[room]["negs"]
-		username = games[room]["buzzed"]
+		username = games[room]["buzzed"][0]
 		games[room]["buzzed"] = ""
-		emit("update_score_event", {"username":username, "players": games[room]["players"]}, room=room)
+		nplayers = {}
+		for r in games[room]["players"].keys():
+			nplayers[r] = games[room]["players"][r][0]
+		emit("update_score_event", {"username": username, "players": nplayers}, room=room)
 		emit("unlocked_event", {}, room=room)
+
 
 # When the player buzzes
 @socketio.on('buzz')
 def buzz(data):
 	room = data["room"]
+	if games[room]["players"][data["username"]][1] != data['_gid']:
+		return
 	if room not in games.keys():
 		return render_template('gamenotfound.html', title="Join Game", version=str(version))
 	if not games[room]["locked"]:
@@ -222,6 +236,10 @@ def buzz(data):
 @socketio.on('leave')
 def on_leave(data):
 	room = data['room']
+	if dohash(data["_gid"]) == room:
+		pass
+	elif games[room]["players"][data["username"]][1] != data['_gid']:
+		return
 	if room not in games.keys():
 		return render_template('gamenotfound.html', title="Join Game", version=str(version))
 	username = ""

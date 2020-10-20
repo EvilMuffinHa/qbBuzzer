@@ -4,6 +4,7 @@ code = document.getElementById("code").value;
 name = document.getElementById("name").value;
 kickurl = document.getElementById("kick").value;
 hostleave = document.getElementById("hostleave").value;
+gid = document.getElementById("gid").value;
 
 function removeAllChildren(e) {
 	var child = e.lastElementChild;
@@ -15,7 +16,7 @@ function removeAllChildren(e) {
 
 socket.on("connect", function() {
 	// when client first connects to a game
-	socket.emit("join", {"username": name, "room": code, "_gid": ""});
+	socket.emit("join", {"username": name, "room": code, "_gid": gid});
 })
 
 socket.on("player_join_event", function(datas) {
@@ -135,7 +136,7 @@ function unlock() {
 
 function buzz() {
 	// when client hits buzz
-	socket.emit("buzz", {"username": name, "room": code, "_gid": ""});
+	socket.emit("buzz", {"username": name, "room": code, "_gid": gid});
 }
 
 $(document).on('keypress', function(e) {
@@ -147,6 +148,6 @@ $(document).on('keypress', function(e) {
 
 window.onbeforeunload = function leave() {
 	// when client leaves
-	socket.emit("leave", {"username": name, "room": code, "_gid": ""});
+	socket.emit("leave", {"username": name, "room": code, "_gid": gid});
 }
 

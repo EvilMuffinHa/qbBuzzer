@@ -46,6 +46,7 @@ window.onbeforeunload = function leave() {
 socket.on("player_join_event", function(datas) {
 
 	data = datas["players"]
+	console.log(data)
 	div = document.getElementById("sidebar");
 	removeAllChildren(div);
 	if (Object.keys(data).length == 0) {
