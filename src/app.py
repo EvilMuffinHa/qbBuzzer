@@ -245,21 +245,13 @@ def on_leave(data):
 			return
 		else:
 			return
-	if data["username"] in games[room]["players"].keys():
+	if data["username"] not in games[room]["players"].keys():
 		return # you have been kicked
 	if dohash(data["_gid"]) == room:
 		pass
 	elif games[room]["players"][data["username"]][1] != data['_gid']:
 		return
-	username = ""
-	if "username" in data.keys():
-		username = data['username']
-	else:
-		gid = data["_gid"]
-		if dohash(gid) == room:
-			leave_room(str(room))
-			emit('host_leave_event', {'host': 0}, room=room)
-			return
+	username = data['username']
 	del games[room]["players"][username]
 	leave_room(str(room))
 	emit('player_leave_event', {"player": username}, room=room)
