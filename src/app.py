@@ -134,18 +134,17 @@ socketio = SocketIO(app)
 @socketio.on('join')
 def on_join(data):
 	room = data['room']
+	if room not in games.keys():
+		return render_template('gamenotfound.html', title="Join Game", version=str(version))
 	if dohash(data["_gid"]) == room:
 		pass
 	elif games[room]["players"][data['username']][1] != data['_gid']:
 		return
-	if room not in games.keys():
-		return render_template('gamenotfound.html', title="Join Game", version=str(version))
 	join_room(str(room))
 	nplayers = {}
 	for r in games[room]["players"].keys():
 		nplayers[r] = games[room]["players"][r][0]
 	msg = {"locked": games[room]["locked"], "players": nplayers}
-	print(msg)
 	emit('player_join_event', msg, room=room)
 
 
@@ -208,8 +207,8 @@ def host_msg(data):
 	elif "negs" in msg.keys():
 		if games[room]["buzzed"] == "":
 			return
-		games[room]["players"][games[room]["buzzed"]] -= games[room]["negs"]
-		username = games[room]["buzzed"][0]
+		games[room]["players"][games[room]["buzzed"]][0] -= games[room]["negs"]
+		username = games[room]["buzzed"]
 		games[room]["buzzed"] = ""
 		nplayers = {}
 		for r in games[room]["players"].keys():
@@ -222,10 +221,10 @@ def host_msg(data):
 @socketio.on('buzz')
 def buzz(data):
 	room = data["room"]
-	if games[room]["players"][data["username"]][1] != data['_gid']:
-		return
 	if room not in games.keys():
 		return render_template('gamenotfound.html', title="Join Game", version=str(version))
+	if games[room]["players"][data["username"]][1] != data['_gid']:
+		return
 	if not games[room]["locked"]:
 		games[room]["buzzed"] = data["username"]
 		emit("buzz_event", data, room=room)  # Just send it back
@@ -236,12 +235,22 @@ def buzz(data):
 @socketio.on('leave')
 def on_leave(data):
 	room = data['room']
+	if room not in games.keys():
+		return render_template('gamenotfound.html', title="Join Game", version=str(version))
+	if "username" not in data.keys():
+		if dohash(data["_gid"]) == room:
+			app.logger.debug("Game host at " + data["_gid"] + " closed game at " + room)
+			leave_room(str(room))
+			emit('host_leave_event', {'host': 0}, room=room)
+			return
+		else:
+			return
+	if data["username"] in games[room]["players"].keys():
+		return # you have been kicked
 	if dohash(data["_gid"]) == room:
 		pass
 	elif games[room]["players"][data["username"]][1] != data['_gid']:
 		return
-	if room not in games.keys():
-		return render_template('gamenotfound.html', title="Join Game", version=str(version))
 	username = ""
 	if "username" in data.keys():
 		username = data['username']
